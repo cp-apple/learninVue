@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>vue增删改个人信息</title>
+	<style>
+		fieldset{
+			width: 25%;
+			margin: 5% auto 20px;
+		}	
+		legend{
+			text-align: center;
+		}
+		button{
+			line-height: 24px;
+			border:0;
+			color:#fff;
+			cursor:pointer;
+			border-radius: 3px;
+			outline: none;
+		}
+		form{
+			margin: 0 auto;
+			width:90%;
+		}
+		input,select{
+			padding-left: 8px;
+			width: 200px;
+			height: 24px;
+			border: 1px solid #ddd;
+			border-radius: 5px;
+			outline: #FFAC38;
+		}
+		input:focus{
+			border-color: #FFAC38;
+		}
+		select{
+			width: 210px;
+			height: 28px;
+		}
+		table{
+			margin: 0 auto;
+			width:90%;
+			border-collapse:collapse;
+			text-align:center;
+		}
+		thead tr{
+			background-color:#aae;
+			color:#fff;
+		}
+		td{
+			border:1px solid #ddd;
+			line-height: 30px;
+		}
+		.addBtn{
+			background-color:#aca
+		}
+		.deleteBtn{
+			background-color: #a00
+		}
+		.editBtn{
+			background-color:#aaccee;			
+		}
+		.editSaveBtn{
+			background-color: #00a;
+		}
+		.editCancelBtn{
+			background-color: #aaa;
+		}
+		/*总结*/
+		.summary{
+			width: 80%;
+			margin: 0 auto;
+		}
+		.summary h3,.summary h4{
+			color: #ace;
+			font-size: 16px;
+		}
+		.summary h3{
+			color: #0a0;
+		}
+		.summary p{
+			font-size: 14px;
+		}
+	</style>
+</head>
+<body>
+	<div id="newPerson">
+		<fieldset>
+			<legend><span v-if="isEdit">编辑</span><span v-else>创建</span>个人信息</legend>
+			<form action="#">
+				<p>姓名：<input name="name" type="text" v-model="newPerson.name"></p>  
+				<p>年龄：<input name="age" type="number" v-model="newPerson.age"></p>
+				<p>性别：<select name="Sex" v-model="newPerson.sex">
+						<option value="男">男</option>
+						<option value="女">女</option>
+						<option value="未知">未知</option>
+					</select>  					
+				</p>
+				<p>
+					<input name="search" type="text" placeholder="请输入需要查询的内容" @input="searchPeo">
+					<span v-if="isEdit">
+						<button :class="'editSaveBtn'" type="button" @click="editSave">编辑保存</button>
+						<button :class="'editCancelBtn'" type="button" @click="editCancel">编辑取消</button>
+					</span>
+					<button :class="'addBtn'" type="button" @click="createPeo" v-else>创建</button>
+				</p>
+			</form>
+			<table>
+				<thead>
+					<tr>
+						<td>姓名</td>
+						<td>年龄</td>
+						<td>性别</td>
+						<td>操作</td>
+					</tr>
+				</thead>
+				<tbody>
+					<tr v-for="(peo,$index) in person">
+						<td>{{peo.name}}</td>
+						<td>{{peo.age}}</td>
+						<td>{{peo.sex}}</td>
+						<td>
+							<button :class="'editBtn'" type="button" @click="editPeo($index)">编辑</button>
+							<button :class="'deleteBtn'" type="button" @click="deletePeo($index)">删除</button>						
+						</td>
+					</tr>
+				</tbody>
+			</table>
+		</fieldset>  
+	</div>
+
+	<div class="summary">
+		<h3>在实现这个小demo时遇到如下问题：</h3>
+		<div>
+			<h4>一、在实现修改功能时，获取修改人员信息进行修改（未点击保存）的过程中，table里相对应人员的数据也在实时变化。我想实现的是点击编辑保存按钮，table里对应的人员信息才发生更改。</h4>
+			<p>答：this.person=JSON.parse(JSON.stringify(this.allPerson));深度拷贝</p>
+			<h4>二、查询功能有个bug，在查询过程中删改人员信息会造成人员数据不正确（待解决）。</h4>
+			<p>答：笨办法，for循环在总人员allPerson里找到相应人员数据进行操作了在展示。</p>
+		</div>
+
+	</div>
+</body>
+</html>
+<!-- <script src="https://unpkg.com/vue"></script> -->
+<script src="vue2.4.2.js"></script>
+<script>
+	var vm=new Vue({
+		el:'#newPerson',
+		data:{
+			isEdit:false,  //标识是否是编辑状态
+			editPeoId:'',
+			newPerson:{
+				name:'',
+				age:'',
+				sex:'男'
+			},
+			allPerson:[],
+			person:[{
+				name:'生素',
+				age:'89',
+				sex:'未知'
+			},{
+				name:'嗒嗒',
+				age:'13',
+				sex:'男'
+			},{
+				name:'朵朵',
+				age:'1',
+				sex:'女'
+			}],   
+		},
+		created(){
+			console.log('created');
+			this.allPerson=JSON.parse(JSON.stringify(this.person));
+		},
+		methods:{
+			//清空表单数据
+			resetNewPeo:function(){
+				this.newPerson={
+					name:'',
+					age:'',
+					sex:'男'
+				}; 
+			},
+			//新增人员
+			createPeo:function(){
+				this.person=JSON.parse(JSON.stringify(this.allPerson));
+				if(this.newPerson.name==''||this.newPerson.age==''){
+					alert('姓名年龄为必填项。');
+					return;
+				}				
+				this.person.push(this.newPerson);
+				this.resetNewPeo();    
+				this.allPerson=JSON.parse(JSON.stringify(this.person));
+			},
+			//编辑人员
+			editPeo:function(index){
+				this.isEdit=true;
+				this.editPeoId=index;  //被修改的人
+				this.newPerson=JSON.parse(JSON.stringify(this.person[index]));
+			},
+			//编辑保存
+			editSave:function(){
+				for(var i in this.allPerson){					
+					if(this.allPerson[i].name==this.person[this.editPeoId].name&&this.allPerson[i].age==this.person[this.editPeoId].age&&this.allPerson[i].sex==this.person[this.editPeoId].sex){
+						this.allPerson[i]=this.newPerson;
+					}
+				}
+				this.person[this.editPeoId]=this.newPerson;				
+				this.resetNewPeo();   
+				this.isEdit=false;
+			},
+			//编辑取消
+			editCancel:function(){
+				this.isEdit=false;
+				this.resetNewPeo(); 
+			},
+			//删除人员
+			deletePeo:function(index){
+				var tip=confirm('你确认要删除人员'+this.person[index].name+'吗？');
+				if(tip){
+					for(var i in this.allPerson){					
+						if(this.allPerson[i].name==this.person[index].name&&this.allPerson[i].age==this.person[index].age&&this.allPerson[i].sex==this.person[index].sex){
+							this.allPerson.splice(i,1);	
+						}
+					}
+					this.person.splice(index,1);	
+				}
+				
+			},
+			//查询人员
+			searchPeo:function(e){
+				console.log(this.allPerson);				
+				var searchVal=e.target.value;  //查询的值
+				if(searchVal){
+					var searchResultPeo=[];  //查询的人员结果
+					for(var i in this.allPerson){
+						if (this.allPerson[i].name.indexOf(searchVal)>-1||this.allPerson[i].age.indexOf(searchVal)>-1||this.allPerson[i].sex.indexOf(searchVal)>-1) {
+							searchResultPeo.push(this.allPerson[i]);
+						}
+					}			
+					this.person=JSON.parse(JSON.stringify(searchResultPeo));
+				}else{
+					this.person=JSON.parse(JSON.stringify(this.allPerson));
+				}				
+				
+			}
+		}
+	});	
+</script>
