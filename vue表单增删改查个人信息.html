@@ -134,7 +134,7 @@
 		<h3>在实现这个小demo时遇到如下问题：</h3>
 		<div>
 			<h4>一、在实现修改功能时，获取修改人员信息进行修改（未点击保存）的过程中，table里相对应人员的数据也在实时变化。我想实现的是点击编辑保存按钮，table里对应的人员信息才发生更改。</h4>
-			<p>答：this.person=JSON.parse(JSON.stringify(this.allPerson));深度拷贝</p>
+			<p>答：this.newPerson=JSON.parse(JSON.stringify(this.person[index]));深度拷贝。因为this.person[index]是个Object类型的数据，若使用=赋值，则赋值操作为浅度拷贝（把数据的地址赋值给对应变量，而没有把具体的数据复制给变量，变量会随数据值的变化而变化）。</p>
 			<h4>二、查询功能有个bug，在查询过程中删改人员信息会造成人员数据不正确（待解决）。</h4>
 			<p>答：笨办法，for循环在总人员allPerson里找到相应人员数据进行操作了在展示。</p>
 		</div>
@@ -247,5 +247,6 @@
 				
 			}
 		}
-	});	
+	});
+	console.log(vm);	
 </script>
