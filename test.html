@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+
+<head lang="en">
+    <meta charset="UTF-8">
+    <title>just test page</title>
+</head>
+
+<body>
+    <form action="#">
+    	<div class="cc">
+    		<input type="text" name="othername" value="othername">
+    		<input type="text" name="otherSex" value="otherSex">
+    		<input type="text" name="otherLike" value="otherLike">
+    	</div>
+    	<input type="text" name="username" value="username">
+    	<input type="text" name="userInterest" value="userInterest">
+    	<button type="button">点击</button>
+    </form>
+    
+</body>
+</html>
+<script src="jquery-1.9.1.min.js"></script>
+<script>
+	$('button').click(function(){
+		var data=$('form :not(.cc input)').serialize();
+		console.log(data); 
+	});
+</script>
